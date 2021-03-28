@@ -13,17 +13,24 @@ export default function Home(): JSX.Element {
 
   const submitVal = async () => {
     const data = form.getFieldsValue();
+    try {
+      await PostRecord({
+        date_time: data.dateTime.format('YYYY-MM-DD'),
+        pig_type: +data.pigType,
+        period_type: +data.periodType,
+        change_reason: +data.changeReason,
+        pig_num: data.pigNum,
+        pig_weight: data.pigWeight,
+      });
 
-    await PostRecord({
-      date_time: data.dateTime.format('YYYY-MM-DD'),
-      pig_type: +data.pigType,
-      period_type: +data.periodType,
-      change_reason: +data.changeReason,
-      pig_num: data.pigNum,
-      pig_weight: data.pigWeight,
-    });
+      message.info('添加成功');
+    } catch (e) {
+      message.error('添加失败');
+    }
+  };
 
-    message.info('添加成功');
+  const resetVal = () => {
+    form.resetFields();
   };
 
   const onValChange = (changedValues: any) => {
@@ -151,7 +158,12 @@ export default function Home(): JSX.Element {
           <Button size="large" type="primary" onClick={submitVal}>
             提交
           </Button>
-          <Button danger size="large" style={{ marginLeft: 8 }}>
+          <Button
+            danger
+            size="large"
+            style={{ marginLeft: 8 }}
+            onClick={resetVal}
+          >
             清除
           </Button>
         </FormItem>
