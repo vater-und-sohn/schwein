@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Form, Select, InputNumber, Button } from 'antd';
 import dayjs from 'dayjs';
 import { DatePicker } from '@/components';
@@ -8,9 +8,35 @@ const Option = Select.Option;
 
 export default function Home(): JSX.Element {
   const [form] = Form.useForm();
+  const [periodType, setPeriodType] = useState('0');
 
   const submitVal = () => {
     console.log(form.getFieldsValue(true));
+  };
+
+  const onValChange = (changedValues: any) => {
+    // periodType 改变时需要切换 changeReason
+    if (Object.prototype.hasOwnProperty.call(changedValues, 'periodType')) {
+      setPeriodType(() => changedValues['periodType']);
+
+      if (changedValues['periodType'] === '1') {
+        // 改变为增加时 选择增加默认值
+        form.setFieldsValue([
+          {
+            name: 'changeReason',
+            value: '0',
+          },
+        ]);
+      } else if (changedValues['periodType'] === '2') {
+        // 改变为减少时 选择减少默认值
+        form.setFieldsValue([
+          {
+            name: 'changeReason',
+            value: '2',
+          },
+        ]);
+      }
+    }
   };
 
   return (
@@ -18,6 +44,7 @@ export default function Home(): JSX.Element {
       <Form
         layout="horizontal"
         form={form}
+        onValuesChange={onValChange}
         initialValues={{
           dateTime: dayjs(),
           pigType: '0',
@@ -62,22 +89,30 @@ export default function Home(): JSX.Element {
           </Select>
         </FormItem>
 
-        <FormItem
-          label="增减原因"
-          labelCol={{ span: 10 }}
-          wrapperCol={{ span: 8 }}
-          name="changeReason"
-        >
-          <Select size="large" style={{ width: 192 }}>
-            <Option value="0">转群</Option>
-            <Option value="1">购入调拨</Option>
-
-            <Option value="2">转群</Option>
-            <Option value="3">出售（转出）</Option>
-            <Option value="4">死亡</Option>
-            <Option value="5">淘汰</Option>
-          </Select>
-        </FormItem>
+        {periodType === '1' || periodType === '2' ? (
+          <FormItem
+            label="增减原因"
+            labelCol={{ span: 10 }}
+            wrapperCol={{ span: 8 }}
+            name="changeReason"
+          >
+            <Select size="large" style={{ width: 192 }}>
+              {periodType === '1' ? (
+                <>
+                  <Option value="0">转群</Option>
+                  <Option value="1">购入调拨</Option>
+                </>
+              ) : (
+                <>
+                  <Option value="2">转群</Option>
+                  <Option value="3">出售（转出）</Option>
+                  <Option value="4">死亡</Option>
+                  <Option value="5">淘汰</Option>
+                </>
+              )}
+            </Select>
+          </FormItem>
+        ) : null}
 
         <FormItem
           label="头数"
