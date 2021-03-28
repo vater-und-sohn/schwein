@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { Form, Select, InputNumber, Button } from 'antd';
+import { Form, Select, InputNumber, Button, message } from 'antd';
 import dayjs from 'dayjs';
 import { DatePicker } from '@/components';
+import { PostRecord } from '@/services/record';
 
 const FormItem = Form.Item;
 const Option = Select.Option;
@@ -10,8 +11,19 @@ export default function Home(): JSX.Element {
   const [form] = Form.useForm();
   const [periodType, setPeriodType] = useState('0');
 
-  const submitVal = () => {
-    console.log(form.getFieldsValue(true));
+  const submitVal = async () => {
+    const data = form.getFieldsValue();
+
+    await PostRecord({
+      date_time: data.dateTime.format('YYYY-MM-DD'),
+      pig_type: +data.pigType,
+      period_type: +data.periodType,
+      change_reason: +data.changeReason,
+      pig_num: data.pigNum,
+      pig_weight: data.pigWeight,
+    });
+
+    message.info('添加成功');
   };
 
   const onValChange = (changedValues: any) => {
@@ -50,7 +62,7 @@ export default function Home(): JSX.Element {
           pigType: '0',
           periodType: '0',
           changeReason: '0',
-          pingNum: 0,
+          pigNum: 0,
           pigWeight: 0,
         }}
       >
@@ -118,7 +130,7 @@ export default function Home(): JSX.Element {
           label="头数"
           labelCol={{ span: 10 }}
           wrapperCol={{ span: 8 }}
-          name="pingNum"
+          name="pigNum"
         >
           <InputNumber size="large" style={{ width: 100 }} />
         </FormItem>

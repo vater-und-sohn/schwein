@@ -1,5 +1,5 @@
 import request from '@/utils/request';
 
-export const PostRecord = () => {
-  return request.post('/record', {});
+export const PostRecord = (data: any) => {
+  return request.post('/record', data);
 };
