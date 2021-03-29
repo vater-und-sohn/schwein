@@ -1,173 +1,128 @@
-import React, { useState } from 'react';
-import { Form, Select, InputNumber, Button, message } from 'antd';
-import dayjs from 'dayjs';
+import React from 'react';
+import { InputNumber, Button, Descriptions, Divider } from 'antd';
 import { DatePicker } from '@/components';
-import { PostRecord } from '@/services/record';
-
-const FormItem = Form.Item;
-const Option = Select.Option;
 
 export default function Home(): JSX.Element {
-  const [form] = Form.useForm();
-  const [periodType, setPeriodType] = useState('0');
-
-  const submitVal = async () => {
-    const data = form.getFieldsValue();
-    try {
-      await PostRecord({
-        date_time: data.dateTime.format('YYYY-MM-DD'),
-        pig_type: +data.pigType,
-        period_type: +data.periodType,
-        change_reason: +data.changeReason,
-        pig_num: data.pigNum,
-        pig_weight: data.pigWeight,
-      });
-
-      message.info('添加成功');
-    } catch (e) {
-      message.error('添加失败');
-    }
-  };
-
-  const resetVal = () => {
-    form.resetFields();
-  };
-
-  const onValChange = (changedValues: any) => {
-    // periodType 改变时需要切换 changeReason
-    if (Object.prototype.hasOwnProperty.call(changedValues, 'periodType')) {
-      setPeriodType(() => changedValues['periodType']);
-
-      if (changedValues['periodType'] === '1') {
-        // 改变为增加时 选择增加默认值
-        form.setFieldsValue([
-          {
-            name: 'changeReason',
-            value: '0',
-          },
-        ]);
-      } else if (changedValues['periodType'] === '2') {
-        // 改变为减少时 选择减少默认值
-        form.setFieldsValue([
-          {
-            name: 'changeReason',
-            value: '2',
-          },
-        ]);
-      }
-    }
-  };
-
   return (
     <div style={{ marginTop: 100 }}>
-      <Form
-        layout="horizontal"
-        form={form}
-        onValuesChange={onValChange}
-        initialValues={{
-          dateTime: dayjs(),
-          pigType: '0',
-          periodType: '0',
-          changeReason: '0',
-          pigNum: 0,
-          pigWeight: 0,
-        }}
-      >
-        <FormItem
-          label="日期"
-          labelCol={{ span: 10 }}
-          wrapperCol={{ span: 8 }}
-          name="dateTime"
-        >
-          <DatePicker name="startDate" />
-        </FormItem>
+      <Descriptions title="公猪报表" bordered>
+        <Descriptions.Item label="日期" span={3}>
+          <DatePicker />
+        </Descriptions.Item>
 
-        <FormItem
-          label="种类"
-          labelCol={{ span: 10 }}
-          wrapperCol={{ span: 8 }}
-          name="pigType"
-        >
-          <Select size="large" style={{ width: 192 }}>
-            <Option value="0">公猪</Option>
-            <Option value="1">母猪</Option>
-          </Select>
-        </FormItem>
+        <Descriptions.Item label="期初" span={4}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div>
+              数量：
+              <InputNumber size="large" style={{ width: 100 }} />
+            </div>
+            <div>
+              重量：
+              <InputNumber size="large" style={{ width: 100 }} />
+            </div>
+          </div>
+        </Descriptions.Item>
 
-        <FormItem
-          label="增减时期"
-          labelCol={{ span: 10 }}
-          wrapperCol={{ span: 8 }}
-          name="periodType"
-        >
-          <Select size="large" style={{ width: 192 }}>
-            <Option value="0">期初</Option>
-            <Option value="1">增加</Option>
-            <Option value="2">减少</Option>
-            <Option value="3">期末</Option>
-          </Select>
-        </FormItem>
+        <Descriptions.Item label="期末" span={4}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div>
+              数量：
+              <InputNumber size="large" style={{ width: 100 }} />
+            </div>
+            <div>
+              重量：
+              <InputNumber size="large" style={{ width: 100 }} />
+            </div>
+          </div>
+        </Descriptions.Item>
 
-        {periodType === '1' || periodType === '2' ? (
-          <FormItem
-            label="增减原因"
-            labelCol={{ span: 10 }}
-            wrapperCol={{ span: 8 }}
-            name="changeReason"
-          >
-            <Select size="large" style={{ width: 192 }}>
-              {periodType === '1' ? (
-                <>
-                  <Option value="0">转群</Option>
-                  <Option value="1">购入调拨</Option>
-                </>
-              ) : (
-                <>
-                  <Option value="2">转群</Option>
-                  <Option value="3">出售（转出）</Option>
-                  <Option value="4">死亡</Option>
-                  <Option value="5">淘汰</Option>
-                </>
-              )}
-            </Select>
-          </FormItem>
-        ) : null}
+        <Descriptions.Item label="增加-转入" span={2}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div>
+              数量：
+              <InputNumber size="large" style={{ width: 100 }} />
+            </div>
+            <div>
+              重量：
+              <InputNumber size="large" style={{ width: 100 }} />
+            </div>
+          </div>
+        </Descriptions.Item>
 
-        <FormItem
-          label="头数"
-          labelCol={{ span: 10 }}
-          wrapperCol={{ span: 8 }}
-          name="pigNum"
-        >
-          <InputNumber size="large" style={{ width: 100 }} />
-        </FormItem>
+        <Descriptions.Item label="增加-购买" span={2}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div>
+              数量：
+              <InputNumber size="large" style={{ width: 100 }} />
+            </div>
+            <div>
+              重量：
+              <InputNumber size="large" style={{ width: 100 }} />
+            </div>
+          </div>
+        </Descriptions.Item>
 
-        <FormItem
-          label="重量"
-          labelCol={{ span: 10 }}
-          wrapperCol={{ span: 8 }}
-          name="pigWeight"
-        >
-          <InputNumber size="large" style={{ width: 100 }} />
-        </FormItem>
+        <Descriptions.Item label="减少-转出" span={2}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div>
+              数量：
+              <InputNumber size="large" style={{ width: 100 }} />
+            </div>
+            <div>
+              重量：
+              <InputNumber size="large" style={{ width: 100 }} />
+            </div>
+          </div>
+        </Descriptions.Item>
 
-        <FormItem
-          style={{ marginTop: 48 }}
-          wrapperCol={{ span: 10, offset: 10 }}
-        >
-          <Button size="large" type="primary" onClick={submitVal}>
-            提交
-          </Button>
-          <Button
-            danger
-            size="large"
-            style={{ marginLeft: 8 }}
-            onClick={resetVal}
-          >
-            清除
-          </Button>
-        </FormItem>
-      </Form>
+        <Descriptions.Item label="减少-卖出" span={2}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div>
+              数量：
+              <InputNumber size="large" style={{ width: 100 }} />
+            </div>
+            <div>
+              重量：
+              <InputNumber size="large" style={{ width: 100 }} />
+            </div>
+          </div>
+        </Descriptions.Item>
+
+        <Descriptions.Item label="减少-死亡" span={2}>
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div>
+              数量：
+              <InputNumber size="large" style={{ width: 100 }} />
+            </div>
+            <div>
+              重量：
+              <InputNumber size="large" style={{ width: 100 }} />
+            </div>
+          </div>
+        </Descriptions.Item>
+
+        <Descriptions.Item label="减少-其他">
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div>
+              数量：
+              <InputNumber size="large" style={{ width: 100 }} />
+            </div>
+            <div>
+              重量：
+              <InputNumber size="large" style={{ width: 100 }} />
+            </div>
+          </div>
+        </Descriptions.Item>
+      </Descriptions>
+
+      <Divider />
+
+      <Button size="large" type="primary">
+        提交
+      </Button>
+      <Button danger size="large" style={{ marginLeft: 8 }}>
+        清除
+      </Button>
     </div>
   );
 }
